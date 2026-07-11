@@ -180,7 +180,12 @@
                         }} รายการ</p>
                 </div>
                 <div class="flex flex-col gap-3 sm:flex-row sm:pr-1">
-                    <div class="relative"><svg class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input
+                    <div class="relative"><svg
+                            class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-500"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <circle cx="11" cy="11" r="7"></circle>
+                            <path d="m20 20-4-4"></path>
+                        </svg><input
                             class="w-full rounded-lg border border-slate-700 bg-slate-950 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-500 sm:w-64"
                             type="search" placeholder="ค้นหา container..." [value]="searchTerm()"
                             (input)="updateSearch($event)" /></div><select
@@ -200,7 +205,7 @@
                     </select>
                 </div>
             </div>
-            <div class="divide-y divide-slate-800 md:hidden">
+            <div class="divide-y divide-slate-800 xl:hidden">
                 @for (container of paginatedContainers(); track container.id) {
                 <article class="p-4">
                     <div class="flex items-start justify-between gap-3">
@@ -230,7 +235,7 @@
                         </div>
                     </dl>
                     <div class="mt-4 flex gap-2">
-                        <a class="gcursor-pointer rid min-h-11 flex-1 place-items-center rounded-lg border border-blue-500/30 text-sm font-medium text-blue-400"
+                        <a class="cursor-pointer min-h-11 flex-1 flex justify-center items-center place-items-center rounded-lg border border-blue-500/30 text-sm font-medium text-blue-400"
                             [routerLink]="['/containers', container.id, 'logs']">Logs</a>
                         @if (container.state !== 'running') { <button
                             class="cursor-pointer min-h-11 flex-1 rounded-lg border border-emerald-500/30 text-sm font-medium text-emerald-400 disabled:opacity-40"
@@ -257,7 +262,7 @@
                 </article>
                 } @empty { <div class="px-4 py-12 text-center text-sm text-slate-500">ไม่พบ Container</div> }
             </div>
-            <div class="hidden overflow-x-auto md:block">
+            <div class="hidden overflow-x-auto xl:block">
                 <table class="w-full min-w-[900px] text-left text-sm">
                     <thead class="bg-slate-950/50 text-xs uppercase text-slate-500">
                         <tr>
