@@ -35,6 +35,7 @@ export const routes: Routes = [
       (component) => component.ContainerDetailComponent,
     ),
   },
+  { path: 'audit', canActivate: [authGuard], loadComponent: () => import('./pages/audit/audit').then(c => c.AuditComponent) },
   {
     path: '',
     pathMatch: 'full',

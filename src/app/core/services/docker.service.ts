@@ -2,13 +2,14 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 
-import { ContainerActionResponse, ContainerDetailResponse, ContainerListResponse, ContainerLogsResponse, ContainerStatsListResponse, DockerInfoResponse } from "../models/docker.model";
+import { AuditEntry, ContainerActionResponse, ContainerDetailResponse, ContainerListResponse, ContainerLogsResponse, ContainerStatsListResponse, DockerInfoResponse } from "../models/docker.model";
 
 @Injectable({
     providedIn: "root"
 })
 export class DockerService {
     private readonly http = inject(HttpClient)
+    getAudit(limit = 100): Observable<{items: AuditEntry[]}> { return this.http.get<{items: AuditEntry[]}>('/api/audit', { params: new HttpParams().set('limit', limit) }); }
 
     getInfo(): Observable<DockerInfoResponse> {
         return this.http.get<DockerInfoResponse>(

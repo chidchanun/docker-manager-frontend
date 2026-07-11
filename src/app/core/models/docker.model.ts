@@ -119,3 +119,4 @@ export interface ContainerDetailResponse {
   mounts: Array<{ type: string; source: string; destination: string; read_write: boolean }>;
   compose: { project?: string; service?: string; config_file?: string; working_dir?: string };
 }
+export interface AuditEntry { id:string; user:string; action:string; container:string; ip:string; status:number; success:boolean; time:string }
