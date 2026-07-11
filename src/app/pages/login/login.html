@@ -1,0 +1,61 @@
+<main class="grid min-h-dvh place-items-center bg-[#070b14] p-4 text-slate-200 sm:p-6 [background-image:radial-gradient(circle_at_top_left,rgba(37,99,235,0.20),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.12),transparent_30%)]">
+  <section class="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900/95 p-5 shadow-2xl shadow-black/40 backdrop-blur-xl sm:p-8">
+    <div class="flex items-center gap-3.5 border-b border-slate-800 pb-6">
+      <div class="grid size-13 place-items-center rounded-xl bg-blue-600 text-white" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="3" y="4" width="18" height="6" rx="2" />
+          <rect x="3" y="14" width="18" height="6" rx="2" />
+          <path d="M7 7h.01M7 17h.01" />
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-lg font-bold">Docker Manager</h1>
+        <p class="mt-0.5 text-xs text-slate-500">Windows Server Administration</p>
+      </div>
+    </div>
+
+    <div class="my-6">
+      <h2 class="text-3xl font-bold">เข้าสู่ระบบ</h2>
+      <p class="mt-2 leading-6 text-slate-400">เข้าสู่ระบบเพื่อจัดการ Docker containers</p>
+    </div>
+
+    <form class="grid gap-5" [formGroup]="loginForm" (ngSubmit)="submit()" novalidate>
+      <div class="grid gap-2">
+        <label class="text-sm font-semibold text-slate-300" for="email">อีเมล</label>
+        <input class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3.5 py-3 text-slate-50 outline-none transition placeholder:text-slate-600 focus:border-blue-500 focus:ring-3 focus:ring-blue-500/20" id="email" type="email" formControlName="email" placeholder="admin@example.com" autocomplete="username" />
+        @if (loginForm.controls.email.touched && loginForm.controls.email.hasError('required')) {
+          <small class="text-xs text-red-300">กรุณากรอกอีเมล</small>
+        }
+        @if (loginForm.controls.email.touched && loginForm.controls.email.hasError('email')) {
+          <small class="text-xs text-red-300">รูปแบบอีเมลไม่ถูกต้อง</small>
+        }
+      </div>
+
+      <div class="grid gap-2">
+        <label class="text-sm font-semibold text-slate-300" for="password">รหัสผ่าน</label>
+        <input class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3.5 py-3 text-slate-50 outline-none transition placeholder:text-slate-600 focus:border-blue-500 focus:ring-3 focus:ring-blue-500/20" id="password" type="password" formControlName="password" placeholder="กรอกรหัสผ่าน" autocomplete="current-password" />
+        @if (loginForm.controls.password.touched && loginForm.controls.password.hasError('required')) {
+          <small class="text-xs text-red-300">กรุณากรอกรหัสผ่าน</small>
+        }
+        @if (loginForm.controls.password.touched && loginForm.controls.password.hasError('minlength')) {
+          <small class="text-xs text-red-300">รหัสผ่านต้องมีอย่างน้อย 12 ตัวอักษร</small>
+        }
+      </div>
+
+      @if (errorMessage()) {
+        <div class="rounded-lg border border-red-400/30 bg-red-900/25 px-3.5 py-3 text-sm text-red-200" role="alert">{{ errorMessage() }}</div>
+      }
+
+      <button class="flex min-h-12 items-center justify-center gap-2.5 rounded-lg bg-blue-600 font-bold text-white transition hover:bg-blue-700 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60" type="submit" [disabled]="loading()">
+        @if (loading()) {
+          <span class="size-4 animate-spin rounded-full border-2 border-white/35 border-t-white" aria-hidden="true"></span>
+          กำลังเข้าสู่ระบบ
+        } @else {
+          เข้าสู่ระบบ
+        }
+      </button>
+    </form>
+
+    <p class="mt-6 text-center text-xs leading-5 text-slate-500">ระบบนี้สามารถควบคุม Docker Engine ได้ เฉพาะผู้ดูแลระบบที่ได้รับอนุญาตเท่านั้น</p>
+  </section>
+</main>

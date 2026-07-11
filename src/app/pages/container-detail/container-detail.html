@@ -1,0 +1,117 @@
+<main class="min-h-dvh bg-[#070b14] text-slate-200">
+  <header class="border-b border-slate-800 bg-slate-950/80">
+    <div class="mx-auto flex max-w-6xl items-center gap-3 px-4 py-4 sm:px-6">
+      <a
+        class="grid size-10 place-items-center rounded-lg border border-slate-700"
+        routerLink="/dashboard"
+        >←</a
+      >
+      <div>
+        <p class="text-xs text-blue-400">Container Detail</p>
+        <h1 class="font-semibold text-white">{{ detail()?.name || id }}</h1>
+      </div>
+    </div>
+  </header>
+  <div class="mx-auto max-w-6xl px-4 py-6 sm:px-6">
+    @if (loading()) {
+      <div class="h-80 animate-pulse rounded-2xl bg-slate-900"></div>
+    } @else if (error()) {
+      <div class="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-200">
+        {{ error() }}
+      </div>
+    } @else if (detail(); as item) {
+      <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-2xl font-bold text-white">{{ item.name }}</h2>
+          <code class="text-xs text-slate-500">{{ item.id }}</code>
+        </div>
+        <div class="flex gap-2">
+          <a
+            class="rounded-lg border border-blue-500/30 px-4 py-2 text-sm text-blue-400"
+            [routerLink]="['/containers', item.id, 'logs']"
+            >ดู Logs</a
+          ><button class="rounded-lg border border-slate-700 px-4 py-2 text-sm" (click)="load()">
+            Refresh
+          </button>
+        </div>
+      </div>
+      <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="rounded-xl border border-slate-800 bg-slate-900 p-4">
+          <p class="text-xs text-slate-500">Status</p>
+          <p class="mt-1 font-semibold text-emerald-400">{{ item.state.status }}</p>
+        </div>
+        <div class="rounded-xl border border-slate-800 bg-slate-900 p-4">
+          <p class="text-xs text-slate-500">Image</p>
+          <p class="mt-1 truncate">{{ item.config.image }}</p>
+        </div>
+        <div class="rounded-xl border border-slate-800 bg-slate-900 p-4">
+          <p class="text-xs text-slate-500">Restart count</p>
+          <p class="mt-1">{{ item.restart_count }}</p>
+        </div>
+        <div class="rounded-xl border border-slate-800 bg-slate-900 p-4">
+          <p class="text-xs text-slate-500">Health</p>
+          <p class="mt-1">{{ item.state.health || '—' }}</p>
+        </div>
+      </section>
+      <div class="mt-5 grid gap-5 lg:grid-cols-2">
+        <section class="rounded-xl border border-slate-800 bg-slate-900 p-5">
+          <h3 class="font-semibold text-white">Configuration</h3>
+          <dl class="mt-4 grid gap-3 text-sm">
+            <div>
+              <dt class="text-slate-500">Command</dt>
+              <dd class="mt-1 break-all font-mono">
+                {{ displayCommand(item) }}
+              </dd>
+            </div>
+            <div>
+              <dt class="text-slate-500">Working directory</dt>
+              <dd>{{ item.config.working_dir || '—' }}</dd>
+            </div>
+            <div>
+              <dt class="text-slate-500">Restart policy</dt>
+              <dd>{{ item.host_config.restart_policy || 'none' }}</dd>
+            </div>
+            <div>
+              <dt class="text-slate-500">Network mode</dt>
+              <dd>{{ item.host_config.network_mode }}</dd>
+            </div>
+          </dl>
+        </section>
+        <section class="rounded-xl border border-slate-800 bg-slate-900 p-5">
+          <h3 class="font-semibold text-white">Networks & Ports</h3>
+          <div class="mt-4 space-y-3 text-sm">
+            @for (network of item.networks; track network.name) {
+              <div class="rounded-lg bg-slate-950 p-3">
+                <b>{{ network.name }}</b>
+                <p class="text-slate-500">
+                  {{ network.ip_address || 'No IP' }} · {{ network.gateway || 'No gateway' }}
+                </p>
+              </div>
+            }
+            @for (port of item.ports; track port.container_port) {
+              <p class="font-mono text-xs">
+                {{ port.host_ip || 'localhost' }}:{{ port.host_port || '—' }} →
+                {{ port.container_port }}/{{ port.protocol }}
+              </p>
+            }
+          </div>
+        </section>
+      </div>
+      <section class="mt-5 rounded-xl border border-slate-800 bg-slate-900 p-5">
+        <h3 class="font-semibold text-white">Mounts</h3>
+        <div class="mt-4 grid gap-3">
+          @for (mount of item.mounts; track mount.destination) {
+            <div class="rounded-lg bg-slate-950 p-3 text-sm">
+              <p class="break-all text-slate-300">{{ mount.source }} → {{ mount.destination }}</p>
+              <p class="mt-1 text-xs text-slate-500">
+                {{ mount.type }} · {{ mount.read_write ? 'read/write' : 'read only' }}
+              </p>
+            </div>
+          } @empty {
+            <p class="text-sm text-slate-500">ไม่มี mounts</p>
+          }
+        </div>
+      </section>
+    }
+  </div>
+</main>

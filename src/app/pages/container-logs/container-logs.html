@@ -1,0 +1,33 @@
+<main class="min-h-dvh bg-[#070b14] text-slate-200">
+  <header class="border-b border-slate-800 bg-slate-950/80">
+    <div class="mx-auto flex max-w-7xl items-center gap-3 px-4 py-4 sm:px-6 lg:px-8">
+      <a class="grid size-10 shrink-0 place-items-center rounded-lg border border-slate-700 bg-slate-900 hover:bg-slate-800" routerLink="/dashboard" aria-label="กลับ Dashboard">←</a>
+      <div class="min-w-0"><p class="text-xs text-blue-400">Container Logs</p><h1 class="truncate text-lg font-semibold text-white">{{ containerName() || containerID }}</h1></div>
+    </div>
+  </header>
+
+  <div class="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
+    <section class="mb-4 flex flex-col gap-3 rounded-xl border border-slate-800 bg-slate-900/80 p-4 lg:flex-row lg:items-center lg:justify-between">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <label class="flex items-center gap-2 text-sm"><span class="text-slate-400">จำนวนบรรทัด</span><select class="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2" [value]="tail()" (change)="updateTail($event)"><option value="100">100</option><option value="200">200</option><option value="500">500</option><option value="1000">1,000</option><option value="5000">5,000</option></select></label>
+        <label class="flex min-h-10 items-center gap-2 text-sm"><input class="size-4 accent-blue-500" type="checkbox" [checked]="timestamps()" (change)="toggleTimestamps($event)" /> Timestamps</label>
+        <label class="flex min-h-10 items-center gap-2 text-sm"><input class="size-4 accent-blue-500" type="checkbox" [checked]="autoRefresh()" (change)="toggleAutoRefresh($event)" /> Auto refresh 5s</label>
+      </div>
+      <div class="grid grid-cols-3 gap-2 sm:flex">
+        <button class="rounded-lg border border-slate-700 px-3 py-2 text-sm hover:bg-slate-800 disabled:opacity-50" (click)="refresh()" [disabled]="loading()">{{ loading() ? 'Loading...' : 'Refresh' }}</button>
+        <button class="rounded-lg border border-slate-700 px-3 py-2 text-sm hover:bg-slate-800" (click)="copyLogs()">{{ copied() ? 'Copied' : 'Copy' }}</button>
+        <button class="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-500" (click)="downloadLogs()">Download</button>
+      </div>
+    </section>
+
+    @if (errorMessage()) { <div class="mb-4 rounded-xl border border-red-500/25 bg-red-500/10 p-4 text-sm text-red-200">{{ errorMessage() }}</div> }
+    @if (truncated()) { <div class="mb-4 rounded-xl border border-amber-500/25 bg-amber-500/10 p-3 text-sm text-amber-200">ผลลัพธ์ถูกตัดเนื่องจากเกินขนาดสูงสุด 2 MB</div> }
+
+    <section class="relative min-h-[65dvh] overflow-hidden rounded-xl border border-slate-800 bg-[#030712] shadow-2xl">
+      <div class="flex items-center gap-1.5 border-b border-slate-800 px-4 py-3"><span class="size-2.5 rounded-full bg-red-400"></span><span class="size-2.5 rounded-full bg-amber-400"></span><span class="size-2.5 rounded-full bg-emerald-400"></span><span class="ml-2 text-xs text-slate-500">{{ tail() }} lines</span></div>
+      @if (loading() && !logs()) { <div class="grid min-h-[55dvh] place-items-center text-sm text-slate-500">กำลังโหลด logs...</div> }
+      @else if (logs()) { <pre class="max-h-[75dvh] min-h-[55dvh] overflow-auto whitespace-pre-wrap break-words p-4 font-mono text-xs leading-6 text-slate-300 sm:text-sm">{{ logs() }}</pre> }
+      @else { <div class="grid min-h-[55dvh] place-items-center text-sm text-slate-500">Container นี้ยังไม่มี logs</div> }
+    </section>
+  </div>
+</main>
