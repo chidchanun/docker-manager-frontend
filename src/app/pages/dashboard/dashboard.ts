@@ -7,6 +7,7 @@ import { AuthService } from "../../core/services/auth.service";
 import { ApiError } from '../../core/models/auth.model';
 import { ContainerActionResponse, ContainerResponse, ContainerStats, ContainerStatsListResponse, DockerInfoResponse } from '../../core/models/docker.model';
 import { DockerService } from '../../core/services/docker.service';
+import { ToastService } from '../../core/services/toast.service';
 
 type ContainerAction =
     | 'start'
@@ -35,6 +36,7 @@ export class DashboardComponent {
     private readonly authService = inject(AuthService);
     private readonly dockerService = inject(DockerService)
     private readonly router = inject(Router);
+    private readonly toast = inject(ToastService);
     private readonly destroyRef = inject(DestroyRef);
 
     readonly currentUser = this.authService.currentUser;
@@ -140,10 +142,20 @@ export class DashboardComponent {
         this.loadStats();
     }
 
-    chartPoints(metric: keyof ContainerStats): string {
+    chartPoints(
+        metric: keyof ContainerStats,
+        relatedMetric?: keyof ContainerStats,
+    ): string {
         const values = this.statsHistory().map((item) => Number(item[metric]) || 0);
         if (values.length === 0) return '';
-        const max = Math.max(...values, metric === 'cpu_percent' || metric === 'memory_percent' ? 100 : 1);
+        const relatedValues = relatedMetric
+            ? this.statsHistory().map((item) => Number(item[relatedMetric]) || 0)
+            : [];
+        const max = Math.max(
+            ...values,
+            ...relatedValues,
+            metric === 'cpu_percent' || metric === 'memory_percent' ? 100 : 1,
+        );
         return values.map((value, index) => {
             const x = values.length === 1 ? 100 : (index / (values.length - 1)) * 100;
             const y = 38 - (value / max) * 34;
@@ -196,6 +208,7 @@ export class DashboardComponent {
             .subscribe({
                 next: (result) => {
                     this.successMessage.set(result.message);
+                    this.toast.success(result.message);
                     this.loadDashboard(true);
                 },
 
@@ -409,5 +422,6 @@ export class DashboardComponent {
             body?.error ??
             'เกิดข้อผิดพลาดระหว่างอ่านข้อมูล Docker',
         );
+        this.toast.error(this.errorMessage());
     }
 }

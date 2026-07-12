@@ -46,6 +46,7 @@ export class DockerService {
     getContainerDetail(containerID: string): Observable<ContainerDetailResponse> {
         return this.http.get<ContainerDetailResponse>(`/api/containers/${encodeURIComponent(containerID)}`);
     }
+    updateContainerPolicy(id: string, policy: {restart_policy:string;maximum_retry_count:number;cpus:number;memory_bytes:number;pids_limit:number}): Observable<{success:boolean;message:string;warnings:string[]}> { return this.http.patch<{success:boolean;message:string;warnings:string[]}>(`/api/containers/${encodeURIComponent(id)}/policy`, policy); }
 
     startContainer(
         containerID: string,

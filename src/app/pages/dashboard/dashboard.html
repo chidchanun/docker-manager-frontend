@@ -17,7 +17,7 @@
                 <div class="hidden text-right sm:block">
                     <p class="text-sm font-medium">{{ currentUser()?.email }}</p>
                     <p class="text-xs uppercase text-slate-500">{{ currentUser()?.role }}</p>
-                </div><button
+                </div><a class="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm hover:bg-slate-800" routerLink="/audit">Audit</a><button
                     class="rounded-lg border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm hover:bg-slate-800 disabled:opacity-50"
                     (click)="logout()" [disabled]="loggingOut()">{{ loggingOut() ? 'กำลังออก...' : 'ออกจากระบบ'
                     }}</button>
@@ -146,11 +146,12 @@
                     <div class="flex justify-between"><span class="text-sm text-slate-400">Disk I/O</span><strong
                             class="text-amber-400">{{ formatBytesValue(usage.disk_read + usage.disk_write) }}</strong>
                     </div>
-                    <p class="mt-1 text-xs text-slate-500">Read {{ formatBytesValue(usage.disk_read) }} · Write {{
-                        formatBytesValue(usage.disk_write) }}</p><svg class="mt-1 h-16 w-full" viewBox="0 0 100 40"
+                    <div class="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs"><span class="text-amber-400"><i class="mr-1 inline-block size-2 rounded-full bg-amber-400"></i>Read {{ formatBytesValue(usage.disk_read) }}</span><span class="text-orange-500"><i class="mr-1 inline-block size-2 rounded-full bg-orange-500"></i>Write {{ formatBytesValue(usage.disk_write) }}</span></div><svg class="mt-1 h-16 w-full" viewBox="0 0 100 40"
                         preserveAspectRatio="none">
                         <path d="M0 39H100" stroke="#1e293b" />
-                        <polyline [attr.points]="chartPoints('disk_read')" fill="none" stroke="#fbbf24" stroke-width="2"
+                        <polyline [attr.points]="chartPoints('disk_read', 'disk_write')" fill="none" stroke="#fbbf24" stroke-width="2"
+                            vector-effect="non-scaling-stroke" />
+                        <polyline [attr.points]="chartPoints('disk_write', 'disk_read')" fill="none" stroke="#f97316" stroke-width="2"
                             vector-effect="non-scaling-stroke" />
                     </svg>
                 </article>
@@ -158,11 +159,12 @@
                     <div class="flex justify-between"><span class="text-sm text-slate-400">Network I/O</span><strong
                             class="text-emerald-400">{{ formatBytesValue(usage.network_rx + usage.network_tx)
                             }}</strong></div>
-                    <p class="mt-1 text-xs text-slate-500">RX {{ formatBytesValue(usage.network_rx) }} · TX {{
-                        formatBytesValue(usage.network_tx) }}</p><svg class="mt-1 h-16 w-full" viewBox="0 0 100 40"
+                    <div class="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs"><span class="text-emerald-400"><i class="mr-1 inline-block size-2 rounded-full bg-emerald-400"></i>RX {{ formatBytesValue(usage.network_rx) }}</span><span class="text-cyan-400"><i class="mr-1 inline-block size-2 rounded-full bg-cyan-400"></i>TX {{ formatBytesValue(usage.network_tx) }}</span></div><svg class="mt-1 h-16 w-full" viewBox="0 0 100 40"
                         preserveAspectRatio="none">
                         <path d="M0 39H100" stroke="#1e293b" />
-                        <polyline [attr.points]="chartPoints('network_rx')" fill="none" stroke="#34d399"
+                        <polyline [attr.points]="chartPoints('network_rx', 'network_tx')" fill="none" stroke="#34d399"
+                            stroke-width="2" vector-effect="non-scaling-stroke" />
+                        <polyline [attr.points]="chartPoints('network_tx', 'network_rx')" fill="none" stroke="#22d3ee"
                             stroke-width="2" vector-effect="non-scaling-stroke" />
                     </svg>
                 </article>

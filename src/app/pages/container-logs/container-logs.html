@@ -11,7 +11,7 @@
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
         <label class="flex items-center gap-2 text-sm"><span class="text-slate-400">จำนวนบรรทัด</span><select class="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2" [value]="tail()" (change)="updateTail($event)"><option value="100">100</option><option value="200">200</option><option value="500">500</option><option value="1000">1,000</option><option value="5000">5,000</option></select></label>
         <label class="flex min-h-10 items-center gap-2 text-sm"><input class="size-4 accent-blue-500" type="checkbox" [checked]="timestamps()" (change)="toggleTimestamps($event)" /> Timestamps</label>
-        <label class="flex min-h-10 items-center gap-2 text-sm"><input class="size-4 accent-blue-500" type="checkbox" [checked]="autoRefresh()" (change)="toggleAutoRefresh($event)" /> Auto refresh 5s</label>
+        <label class="flex min-h-10 items-center gap-2 text-sm"><input class="size-4 accent-blue-500" type="checkbox" [checked]="autoRefresh()" (change)="toggleAutoRefresh($event)" /> Live Logs (SSE)</label>
       </div>
       <div class="grid grid-cols-3 gap-2 sm:flex">
         <button class="rounded-lg border border-slate-700 px-3 py-2 text-sm hover:bg-slate-800 disabled:opacity-50" (click)="refresh()" [disabled]="loading()">{{ loading() ? 'Loading...' : 'Refresh' }}</button>

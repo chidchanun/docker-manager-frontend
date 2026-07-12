@@ -112,8 +112,8 @@ export interface ContainerDetailResponse {
   id: string; short_id: string; name: string; created_at: string; image_id: string;
   path: string; arguments: string[]; platform: string; driver: string; restart_count: number;
   state: { status: string; running: boolean; health?: string; pid: number; exit_code: number; started_at?: string; finished_at?: string; error?: string };
-  config: { image: string; hostname: string; user?: string; working_dir?: string; entrypoint: string[]; command: string[]; tty: boolean };
-  host_config: { network_mode: string; log_driver: string; restart_policy: string; auto_remove: boolean; privileged: boolean; readonly_root_fs: boolean; shared_memory_bytes: number };
+  config: { image: string; hostname: string; user?: string; working_dir?: string; entrypoint?: string[] | null; command?: string[] | null; tty: boolean };
+  host_config: { network_mode: string; log_driver: string; restart_policy: string; maximum_restart_retries?: number; auto_remove: boolean; privileged: boolean; readonly_root_fs: boolean; shared_memory_bytes: number; memory_bytes: number; nano_cpus: number; pids_limit?: number };
   ports: Array<{ container_port: number; protocol: string; host_ip?: string; host_port?: string }>;
   networks: Array<{ name: string; ip_address?: string; gateway?: string; mac_address?: string }>;
   mounts: Array<{ type: string; source: string; destination: string; read_write: boolean }>;

@@ -98,6 +98,17 @@
         </section>
       </div>
       <section class="mt-5 rounded-xl border border-slate-800 bg-slate-900 p-5">
+        <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-center"><div><h3 class="font-semibold text-white">Container Policy</h3><p class="text-sm text-slate-500">กำหนด restart และ resource limits; ค่า 0 หมายถึงไม่จำกัด</p></div>@if(policyMessage()){<span class="text-sm text-emerald-400">{{policyMessage()}}</span>}</div>
+        <div class="mt-4 flex flex-wrap gap-2"><span class="self-center text-xs text-slate-500">Presets:</span><button class="rounded-md border border-slate-700 px-3 py-1.5 text-xs hover:bg-slate-800" (click)="applyPreset('small')">Small</button><button class="rounded-md border border-slate-700 px-3 py-1.5 text-xs hover:bg-slate-800" (click)="applyPreset('medium')">Medium</button><button class="rounded-md border border-slate-700 px-3 py-1.5 text-xs hover:bg-slate-800" (click)="applyPreset('large')">Large</button><button class="rounded-md border border-slate-700 px-3 py-1.5 text-xs hover:bg-slate-800" (click)="applyPreset('unlimited')">Unlimited</button></div>
+        <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <label class="grid gap-1.5 text-sm"><span class="text-slate-400">Restart policy</span><select class="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5" [value]="restartPolicy()" (change)="restartPolicy.set($any($event.target).value)"><option value="no">No</option><option value="always">Always</option><option value="unless-stopped">Unless stopped</option><option value="on-failure">On failure</option></select></label>
+          <label class="grid gap-1.5 text-sm"><span class="text-slate-400">Max retries</span><input class="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5" type="number" min="0" [disabled]="restartPolicy() !== 'on-failure'" [value]="retryCount()" (input)="updateNumber($event,'retry')" /></label>
+          <label class="grid gap-1.5 text-sm"><span class="text-slate-400">CPU cores</span><input class="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5" type="number" min="0" max="256" step="0.1" [value]="cpuLimit()" (input)="updateNumber($event,'cpu')" /></label>
+          <label class="grid gap-1.5 text-sm"><span class="text-slate-400">Memory (MB)</span><input class="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5" type="number" min="0" [value]="memoryLimitMB()" (input)="updateNumber($event,'memory')" /></label>
+          <label class="grid gap-1.5 text-sm"><span class="text-slate-400">PIDs (-1 unlimited)</span><input class="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5" type="number" min="-1" [value]="pidsLimit()" (input)="updateNumber($event,'pids')" /></label>
+        </div>@if(policyValidation().length){<div class="mt-4 rounded-lg border border-red-500/25 bg-red-500/10 p-3 text-sm text-red-300"><ul class="list-disc space-y-1 pl-5">@for(message of policyValidation();track message){<li>{{message}}</li>}</ul></div>}<div class="mt-5 flex justify-end"><button class="min-h-11 rounded-lg bg-blue-600 px-5 text-sm font-semibold text-white hover:bg-blue-500 disabled:opacity-50" (click)="requestSavePolicy()" [disabled]="savingPolicy() || policyValidation().length > 0">{{savingPolicy()?'Saving...':'Save policy'}}</button></div>
+      </section>
+      <section class="mt-5 rounded-xl border border-slate-800 bg-slate-900 p-5">
         <h3 class="font-semibold text-white">Mounts</h3>
         <div class="mt-4 grid gap-3">
           @for (mount of item.mounts; track mount.destination) {
@@ -115,3 +126,19 @@
     }
   </div>
 </main>
+@if (policyConfirmation() && detail(); as item) {
+<div class="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="policy-confirm-title" (click)="cancelSavePolicy()">
+  <section class="w-full max-w-lg rounded-2xl border border-amber-500/30 bg-slate-900 p-5 shadow-2xl" (click)="$event.stopPropagation()">
+    <div class="grid size-12 place-items-center rounded-full bg-amber-500/10 text-2xl font-bold text-amber-400">!</div>
+    <h2 id="policy-confirm-title" class="mt-4 text-xl font-semibold text-white">ยืนยันการเปลี่ยน Container Policy</h2>
+    <p class="mt-2 text-sm leading-6 text-slate-400">การเปลี่ยน resource limits อาจส่งผลต่อการทำงานของ <strong class="text-white">{{item.name}}</strong> กรุณาตรวจสอบค่าก่อนบันทึก</p>
+    <dl class="mt-4 grid gap-3 rounded-xl border border-slate-800 bg-slate-950 p-4 text-sm">
+      <div class="grid grid-cols-3 gap-2"><dt class="text-slate-500">Policy</dt><dd class="text-slate-500">{{item.host_config.restart_policy||'no'}}</dd><dd class="text-amber-300">→ {{restartPolicy()}}</dd></div>
+      <div class="grid grid-cols-3 gap-2"><dt class="text-slate-500">CPU</dt><dd class="text-slate-500">{{item.host_config.nano_cpus===0?'Unlimited':item.host_config.nano_cpus/1000000000+' cores'}}</dd><dd class="text-amber-300">→ {{cpuLimit()===0?'Unlimited':cpuLimit()+' cores'}}</dd></div>
+      <div class="grid grid-cols-3 gap-2"><dt class="text-slate-500">Memory</dt><dd class="text-slate-500">{{item.host_config.memory_bytes===0?'Unlimited':item.host_config.memory_bytes/1048576+' MB'}}</dd><dd class="text-amber-300">→ {{memoryLimitMB()===0?'Unlimited':memoryLimitMB()+' MB'}}</dd></div>
+      <div class="grid grid-cols-3 gap-2"><dt class="text-slate-500">PIDs</dt><dd class="text-slate-500">{{(item.host_config.pids_limit??-1)<=0?'Unlimited':item.host_config.pids_limit}}</dd><dd class="text-amber-300">→ {{pidsLimit()<=0?'Unlimited':pidsLimit()}}</dd></div>
+    </dl>
+    <div class="mt-6 grid grid-cols-2 gap-3"><button class="min-h-11 rounded-lg border border-slate-700 text-sm text-slate-300 hover:bg-slate-800" (click)="cancelSavePolicy()">ยกเลิก</button><button class="min-h-11 rounded-lg bg-amber-500 text-sm font-semibold text-slate-950 hover:bg-amber-400" (click)="confirmSavePolicy()">ยืนยันและบันทึก</button></div>
+  </section>
+</div>
+}

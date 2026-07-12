@@ -15,6 +15,7 @@ import { AuthService } from '../../core/services/auth.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContainerLogsComponent {
+  private eventSource: EventSource | null = null;
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly dockerService = inject(DockerService);
@@ -34,26 +35,24 @@ export class ContainerLogsComponent {
 
   constructor() {
     this.loadLogs();
-    const timer = window.setInterval(() => {
-      if (this.autoRefresh() && !this.loading()) this.loadLogs(false);
-    }, 5000);
-    this.destroyRef.onDestroy(() => window.clearInterval(timer));
+    this.destroyRef.onDestroy(() => this.closeStream());
   }
 
-  refresh(): void { this.loadLogs(); }
+  refresh(): void { this.autoRefresh() ? this.startStream() : this.loadLogs(); }
 
   updateTail(event: Event): void {
     this.tail.set(Number((event.target as HTMLSelectElement).value));
-    this.loadLogs();
+    this.autoRefresh() ? this.startStream() : this.loadLogs();
   }
 
   toggleTimestamps(event: Event): void {
     this.timestamps.set((event.target as HTMLInputElement).checked);
-    this.loadLogs();
+    this.autoRefresh() ? this.startStream() : this.loadLogs();
   }
 
   toggleAutoRefresh(event: Event): void {
     this.autoRefresh.set((event.target as HTMLInputElement).checked);
+    this.autoRefresh() ? this.startStream() : (this.closeStream(), this.loadLogs());
   }
 
   async copyLogs(): Promise<void> {
@@ -83,6 +82,7 @@ export class ContainerLogsComponent {
           this.containerName.set(response.name);
           this.logs.set(response.logs.replace(/\x1b\[[0-9;]*m/g, ''));
           this.truncated.set(response.truncated);
+          if (this.autoRefresh() && !this.eventSource) this.startStream();
         },
         error: (error: HttpErrorResponse) => {
           if (error.status === 401) {
@@ -95,4 +95,24 @@ export class ContainerLogsComponent {
         },
       });
   }
+
+  private startStream(): void {
+    this.closeStream();
+    this.logs.set('');
+    this.loading.set(true);
+    this.errorMessage.set('');
+    const params = new URLSearchParams({ tail: String(this.tail()), timestamps: String(this.timestamps()) });
+    this.eventSource = new EventSource(`/api/containers/${encodeURIComponent(this.containerID)}/logs/stream?${params}`);
+    this.eventSource.onopen = () => this.loading.set(false);
+    this.eventSource.onmessage = (event) => {
+      const line = (JSON.parse(event.data) as string).replace(/\x1b\[[0-9;]*m/g, '');
+      this.logs.update((current) => `${current}${current ? '\n' : ''}${line}`);
+    };
+    this.eventSource.onerror = () => {
+      this.loading.set(false);
+      this.errorMessage.set('การเชื่อมต่อ Live Logs ขาดหาย กำลังเชื่อมต่อใหม่...');
+    };
+  }
+
+  private closeStream(): void { this.eventSource?.close(); this.eventSource = null; }
 }
